@@ -15,7 +15,7 @@ from md2pdf.utils.console import console, print_header, BRAND
 app = typer.Typer(
     name="md2pdf",
     help="Convert Markdown to beautiful PDFs.",
-    add_completion=False,
+    add_completion=True,
     rich_markup_mode="rich",
 )
 
@@ -26,6 +26,7 @@ app = typer.Typer(
 def cmd_convert(
     source: Path = typer.Argument(..., help="Quelldatei (.md)"),
     output: Optional[Path] = typer.Option(None, "--output", "-o", help="Ausgabe-PDF (default: <input>.pdf)"),
+    config: Optional[Path] = typer.Option(None, "--config", "-c", help="Config-Datei (YAML) laden"),
     theme: str = typer.Option("default", "--theme", "-t", help="Theme-Name oder Pfad zu .yaml"),
     toc: bool = typer.Option(False, "--toc", help="Inhaltsverzeichnis generieren"),
     title_page: bool = typer.Option(False, "--title-page", help="Titelseite aktivieren"),
@@ -42,9 +43,10 @@ def cmd_convert(
 ) -> None:
     """Convert a Markdown file to PDF."""
     from md2pdf.cli.commands.convert import run_convert
-    success = run_convert(
+    success, exit_code = run_convert(
         source=source,
         output=output,
+        config_path=config,
         theme=theme,
         toc=toc,
         title_page=title_page,
@@ -59,7 +61,7 @@ def cmd_convert(
         open_after=open_after,
         verbose=verbose,
     )
-    raise typer.Exit(0 if success else 1)
+    raise typer.Exit(0 if success else exit_code)
 
 
 # ── watch ─────────────────────────────────────────────────────────────────────
@@ -137,7 +139,7 @@ def cmd_interactive() -> None:
     if not data:
         raise typer.Exit(0)
 
-    run_convert(
+    success, exit_code = run_convert(
         source=Path(data["source"]),
         theme=data.get("theme", "default"),
         toc=data.get("toc", False),
@@ -148,6 +150,7 @@ def cmd_interactive() -> None:
         page_size=data.get("page_size", "A4"),
         no_page_numbers=not data.get("page_numbers", True),
     )
+    raise typer.Exit(0 if success else exit_code)
 
 
 # ── default: no args → interactive ────────────────────────────────────────────

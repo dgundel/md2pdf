@@ -70,7 +70,14 @@ def render_html(
         .replace("{total}", '" counter(pages) "')
     )
 
-    # 6. Jinja2 render
+    # 6. Watermark vars for template (None or empty text = no watermark)
+    wm = config.watermark
+    watermark_text = wm.text.strip() if wm else ""
+    watermark_color = wm.color if wm else "#b4b4b4"
+    watermark_opacity = wm.opacity if wm else 0.18
+    watermark_angle = wm.angle if wm else -35
+
+    # 7. Jinja2 render
     env = Environment(
         loader=FileSystemLoader(str(TEMPLATES_DIR)),
         autoescape=select_autoescape(["html"]),
@@ -83,7 +90,10 @@ def render_html(
         page_size=config.page_size,
         page_numbers=config.page_numbers,
         page_number_text=page_number_css,
-        watermark=config.watermark or "",
+        watermark_text=watermark_text,
+        watermark_color=watermark_color,
+        watermark_opacity=watermark_opacity,
+        watermark_angle=watermark_angle,
         title_page_html=title_page_html,
         toc_html=toc_html,
         content_html=content_html,

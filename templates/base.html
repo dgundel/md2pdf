@@ -194,17 +194,18 @@ hr {
 h1 { page-break-before: auto; }
 
 /* ── Watermark ── */
-{% if watermark %}
+{% if watermark_text %}
 @page { background: none; }
 body::before {
-    content: "{{ watermark }}";
+    content: "{{ watermark_text }}";
     position: fixed;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%) rotate(-35deg);
+    transform: translate(-50%, -50%) rotate({{ watermark_angle }}deg);
     font-size: 72pt;
     font-family: var(--font-heading);
-    color: rgba(180, 180, 180, 0.18);
+    color: {{ watermark_color }};
+    opacity: {{ watermark_opacity }};
     white-space: nowrap;
     pointer-events: none;
     z-index: -1;

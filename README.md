@@ -3,6 +3,19 @@
 Convert Markdown to beautiful, professional PDFs — with themes, includes, TOC, title pages, and a gorgeous interactive CLI.
 
 [![CI](https://github.com/dgundel/md2pdf/actions/workflows/ci.yml/badge.svg)](https://github.com/dgundel/md2pdf/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
+## Inhaltsverzeichnis
+
+- [Installation](#installation)
+- [Schnellstart](#schnellstart)
+- [CLI-Referenz](#cli-referenz)
+- [Frontmatter-Konfiguration](#frontmatter-konfiguration)
+- [Include-System](#include-system)
+- [Themes](#themes)
+- [Entwicklung](#entwicklung)
+- [Lizenz](#lizenz)
+- [Contributing](#contributing)
 
 ## Installation
 
@@ -32,6 +45,8 @@ sudo apt install fonts-noto-color-emoji
 
 ## Schnellstart
 
+[Beispiel-Datei](examples/sample.md) zum Ausprobieren: `md2pdf convert examples/sample.md -o beispiel.pdf`
+
 Nach Aktivierung des venv (`source .venv/bin/activate`) im Projektordner:
 
 ```bash
@@ -60,6 +75,7 @@ python -m md2pdf.cli.main convert report.md
 
 Optionen:
   -o, --output PATH          Ausgabe-PDF (default: <input>.pdf)
+  -c, --config PATH          Config-Datei (YAML) laden — Werte als Basis, CLI überschreibt
   -t, --theme TEXT           Theme-Name oder Pfad zu .yaml  [default: default]
   --toc                      Inhaltsverzeichnis generieren
   --title-page               Titelseite aktivieren
@@ -111,6 +127,46 @@ Interaktiver TUI-Wizard mit Schritt-für-Schritt-Konfiguration:
 ./md2pdf_run.py
 ```
 
+### Shell-Completion
+
+Tab-Completion für Befehle und Optionen:
+
+```bash
+# Bash — in ~/.bashrc eintragen
+eval "$(md2pdf --show-completion bash)"
+
+# Zsh — in ~/.zshrc eintragen
+eval "$(md2pdf --show-completion zsh)"
+
+# Fish — Completions speichern
+md2pdf --show-completion fish > ~/.config/fish/completions/md2pdf.fish
+```
+
+Einmalig installieren (persistent): `md2pdf --install-completion zsh` (bzw. bash/fish).
+
+### Exit-Codes
+
+Für Skripte und CI:
+
+| Code | Bedeutung |
+|------|-----------|
+| 0 | Erfolg |
+| 1 | Allgemeiner Fehler (z. B. PDF-Erstellung fehlgeschlagen) |
+| 2 | Nutzung/Validierung (ungültige Optionen, Theme nicht gefunden) |
+| 3 | I/O (Datei nicht gefunden, Schreibfehler) |
+
+Beispiel:
+
+```bash
+md2pdf convert doc.md
+case $? in
+  0) echo "OK" ;;
+  2) echo "Config/Theme prüfen" ;;
+  3) echo "Datei/Rechte prüfen" ;;
+  *) echo "Fehler" ;;
+esac
+```
+
 ---
 
 ## Frontmatter-Konfiguration
@@ -129,7 +185,12 @@ logo: ./assets/logo.png
 toc: true
 lang: de
 page_size: A4
-watermark: "ENTWURF"
+watermark: "ENTWURF"   # oder erweitert:
+# watermark:
+#   text: "ENTWURF"
+#   color: "#888888"
+#   opacity: 0.15
+#   angle: -45
 page_numbers:
   format: "Seite {page} von {total}"
   position: bottom-center
@@ -138,7 +199,35 @@ title_page:
 ---
 ```
 
-**Priorität:** CLI-Flags > Frontmatter > Defaults
+**Priorität:** CLI-Flags > Config-Datei (`-c`) > Umgebungsvariablen > Frontmatter > Defaults
+
+**Config-Datei aus Wizard:** Im interaktiven Modus (Schritt 4) auf „Config speichern“ klicken und Pfad angeben (z. B. `./md2pdf.yaml`). Anschließend: `md2pdf convert doc.md -c md2pdf.yaml`.
+
+### Umgebungsvariablen (CI/CD)
+
+Optionale Konfiguration über `MD2PDF_*`:
+
+| Variable | Beschreibung | Beispiel |
+|----------|--------------|----------|
+| `MD2PDF_THEME` | Theme-Name | `academic` |
+| `MD2PDF_TOC` | Inhaltsverzeichnis (1/true/yes = an) | `1` |
+| `MD2PDF_TITLE` | Dokumenttitel | `Bericht Q1` |
+| `MD2PDF_AUTHOR` | Autor | `Max Mustermann` |
+| `MD2PDF_LANG` | Sprache | `de`, `en` |
+| `MD2PDF_PAGE_SIZE` | Seitengröße | `A4`, `Letter` |
+| `MD2PDF_WATERMARK` | Wasserzeichen-Text | `ENTWURF` |
+| `MD2PDF_CONFIG` | Pfad zu Config-Datei (bei `-c`) | `./md2pdf.yaml` |
+
+Beispiel GitHub Actions:
+
+```yaml
+- name: PDF erzeugen
+  env:
+    MD2PDF_THEME: corporate
+    MD2PDF_TOC: "1"
+    MD2PDF_AUTHOR: ${{ github.repository_owner }}
+  run: md2pdf convert ./docs/ -o ./out/
+```
 
 ---
 

@@ -8,6 +8,7 @@ from pathlib import Path
 from rich.progress import Progress, SpinnerColumn, BarColumn, TextColumn, TimeElapsedColumn
 
 from md2pdf.config.frontmatter import extract_frontmatter, frontmatter_to_jobconfig
+from md2pdf.config.file_config import load_config_file
 from md2pdf.core.include_resolver import resolve_includes
 from md2pdf.core.renderer import render_html
 from md2pdf.core.pdf_engine import render_pdf
@@ -15,11 +16,13 @@ from md2pdf.themes.loader import load_theme
 from md2pdf.utils.console import (
     console, print_header, print_step, print_ok, print_warn, print_error, format_size
 )
+from md2pdf.utils.exit_codes import EXIT_OK, EXIT_ERROR, EXIT_USAGE, EXIT_IO
 
 
 def run_convert(
     source: Path,
     output: Path | None = None,
+    config_path: Path | None = None,
     theme: str = "default",
     toc: bool = False,
     title_page: bool = False,
@@ -33,17 +36,17 @@ def run_convert(
     extra_css: Path | None = None,
     open_after: bool = False,
     verbose: bool = False,
-) -> bool:
+) -> tuple[bool, int]:
     """Execute a single Markdown → PDF conversion.
 
-    Returns True on success, False on failure.
+    Returns (success, exit_code). Exit codes: 0=OK, 1=error, 2=usage/validation, 3=I/O.
     """
     start = time.monotonic()
     print_header()
 
     if not source.exists():
         print_error(f"Datei nicht gefunden: {source}")
-        return False
+        return False, EXIT_IO
 
     # 1. Read source + extract frontmatter
     print_step("Lese", source.name)
@@ -51,6 +54,15 @@ def run_convert(
     fm, body = extract_frontmatter(raw_text)
 
     overrides: dict = {}
+    if config_path:
+        try:
+            file_overrides = load_config_file(config_path)
+            overrides.update(file_overrides)
+            if verbose:
+                print_step("Config geladen", str(config_path))
+        except FileNotFoundError as e:
+            print_error(str(e))
+            return False, EXIT_IO
     if title:
         overrides["title"] = title
     if author:
@@ -88,7 +100,7 @@ def run_convert(
     for w in include_result.warnings:
         print_warn(w)
     if include_result.errors:
-        return False
+        return False, EXIT_IO
 
     # 3. Load theme
     try:
@@ -96,7 +108,7 @@ def run_convert(
         print_step("Lade Theme", config.theme)
     except FileNotFoundError as e:
         print_error(str(e))
-        return False
+        return False, EXIT_USAGE
 
     # 4. Render HTML
     print_step("Rendere HTML")
@@ -129,7 +141,7 @@ def run_convert(
 
     if not pdf_result.success:
         print_error(f"PDF-Erstellung fehlgeschlagen:\n  {pdf_result.error}")
-        return False
+        return False, EXIT_ERROR
 
     # 6. Success summary
     console.print()
@@ -146,4 +158,4 @@ def run_convert(
         cmd = {"darwin": "open", "win32": "start", "linux": "xdg-open"}.get(sys.platform, "xdg-open")
         subprocess.Popen([cmd, str(config.output)])
 
-    return True
+    return True, EXIT_OK

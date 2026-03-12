@@ -25,6 +25,8 @@ from textual.widgets import (
     Switch,
 )
 
+from md2pdf.config.file_config import save_config_from_wizard
+
 
 THEME_COLORS: dict[str, tuple[str, str, str]] = {
     "default":   ("#2563eb", "#1a1a1a", "#ffffff"),
@@ -288,6 +290,7 @@ class SummaryScreen(Screen):
             Static(table_text, classes="summary-table"),
             Horizontal(
                 Button("← Zurück", id="back"),
+                Button("💾 Config speichern", id="save-config"),
                 Button("🚀 Rendern", variant="success", id="render"),
                 Button("Beenden", variant="error", id="quit"),
                 classes="btn-row",
@@ -300,6 +303,11 @@ class SummaryScreen(Screen):
     def go_back(self) -> None:
         self.app.pop_screen()
 
+    @on(Button.Pressed, "#save-config")
+    def save_config(self) -> None:
+        default_path = _start_cwd() / "md2pdf.yaml"
+        self.app.push_screen(SaveConfigScreen(str(default_path)))
+
     @on(Button.Pressed, "#render")
     def do_render(self) -> None:
         self.app.exit(result=self.app.wizard_data)
@@ -307,6 +315,50 @@ class SummaryScreen(Screen):
     @on(Button.Pressed, "#quit")
     def quit_app(self) -> None:
         self.app.exit()
+
+
+class SaveConfigScreen(Screen):
+    """Small screen: enter path and save config YAML."""
+
+    BINDINGS = [Binding("escape", "app.pop_screen", "Abbrechen")]
+
+    def __init__(self, default_path: str = "./md2pdf.yaml") -> None:
+        super().__init__()
+        self._default_path = default_path
+
+    def compose(self) -> ComposeResult:
+        yield Header(show_clock=False)
+        yield Container(
+            Static("✦ Config speichern", classes="brand"),
+            Label("Pfad zur YAML-Config-Datei:"),
+            Input(value=self._default_path, placeholder="./md2pdf.yaml", id="config-path"),
+            Static("", id="config-msg", classes="preview"),
+            Horizontal(
+                Button("Abbrechen", id="cancel"),
+                Button("Speichern", variant="primary", id="save"),
+                classes="btn-row",
+            ),
+            classes="wizard-box",
+        )
+        yield Footer()
+
+    @on(Button.Pressed, "#cancel")
+    def cancel(self) -> None:
+        self.app.pop_screen()
+
+    @on(Button.Pressed, "#save")
+    def save(self) -> None:
+        path_str = self.query_one("#config-path", Input).value.strip()
+        if not path_str:
+            self.query_one("#config-msg", Static).update("[red]Bitte einen Pfad angeben.[/red]")
+            return
+        path = _resolve_path(path_str)
+        try:
+            save_config_from_wizard(self.app.wizard_data, path)
+            self.query_one("#config-msg", Static).update(f"[green]Gespeichert: {path}[/green]")
+            self.app.pop_screen()
+        except OSError as e:
+            self.query_one("#config-msg", Static).update(f"[red]Fehler: {e}[/red]")
 
 
 # ── App ────────────────────────────────────────────────────────────────────────

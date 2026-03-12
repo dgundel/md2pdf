@@ -24,6 +24,14 @@ class TitlePageConfig(BaseModel):
     version: str = ""
 
 
+class WatermarkConfig(BaseModel):
+    """Watermark text and optional style. Empty text = no watermark."""
+    text: str = ""
+    color: str = "#b4b4b4"
+    opacity: float = 0.18
+    angle: float = -35
+
+
 class JobConfig(BaseModel):
     source: Path
     output: Path
@@ -34,7 +42,7 @@ class JobConfig(BaseModel):
     page_numbers: PageNumberConfig = PageNumberConfig()
     page_size: Literal["A4", "A5", "Letter"] = "A4"
     lang: str = "de"
-    watermark: str | None = None
+    watermark: WatermarkConfig | None = None
     syntax_theme: str = "github"
     extra_css: Path | None = None
     max_include_depth: int = 10
@@ -43,3 +51,16 @@ class JobConfig(BaseModel):
     @classmethod
     def to_path(cls, v: str | Path) -> Path:
         return Path(v)
+
+    @field_validator("watermark", mode="before")
+    @classmethod
+    def watermark_from_str_or_dict(cls, v: str | dict | WatermarkConfig | None) -> WatermarkConfig | None:
+        if v is None:
+            return None
+        if isinstance(v, WatermarkConfig):
+            return v
+        if isinstance(v, str):
+            return WatermarkConfig(text=v) if v.strip() else None
+        if isinstance(v, dict):
+            return WatermarkConfig(**{k: v[k] for k in ("text", "color", "opacity", "angle") if k in v})
+        return None

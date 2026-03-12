@@ -27,7 +27,7 @@ def run_batch(pattern: str, output_dir: Path | None = None, merge: bool = False,
             output_dir.mkdir(parents=True, exist_ok=True)
             out = output_dir / md_file.with_suffix(".pdf").name
 
-        ok = run_convert(md_file, output=out, **kwargs)
+        ok, _ = run_convert(md_file, output=out, **kwargs)
         if ok:
             success += 1
         else:
