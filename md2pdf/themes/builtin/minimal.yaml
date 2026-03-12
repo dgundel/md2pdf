@@ -1,0 +1,38 @@
+name: minimal
+
+colors:
+  primary: "#000000"
+  text: "#333333"
+  background: "#ffffff"
+  code_bg: "#fafafa"
+  link: "#000000"
+  border: "#eeeeee"
+  heading: "#000000"
+  table_header_bg: "#f9f9f9"
+
+fonts:
+  body: "'Helvetica Neue', Helvetica, Arial, sans-serif"
+  heading: "'Helvetica Neue', Helvetica, Arial, sans-serif"
+  mono: "'Cascadia Code', 'JetBrains Mono', 'Fira Code', monospace"
+  emoji_fallback:
+    - "Noto Color Emoji"
+    - "Apple Color Emoji"
+    - "Segoe UI Emoji"
+  base_size: "10.5pt"
+  heading_scale: 1.2
+
+margins:
+  top: 20
+  right: 20
+  bottom: 20
+  left: 20
+
+header:
+  show: false
+  content: ""
+  border: false
+
+footer:
+  show: false
+  content: ""
+  border: false

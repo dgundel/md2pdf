@@ -1,0 +1,67 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "md2pdf"
+version = "1.0.0"
+description = "Convert Markdown to beautiful, professional PDFs with themes, TOC, and interactive CLI."
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.10"
+authors = [
+    { name = "md2pdf" }
+]
+keywords = ["markdown", "pdf", "weasyprint", "documentation"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Text Processing :: Markup",
+]
+dependencies = [
+    "weasyprint>=62.0",
+    "mistune>=3.0",
+    "pydantic>=2.0",
+    "typer>=0.12",
+    "rich>=13.0",
+    "textual>=0.50",
+    "jinja2>=3.1",
+    "watchdog>=4.0",
+    "PyYAML>=6.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+]
+
+[project.scripts]
+md2pdf = "md2pdf.cli.main:app"
+
+[tool.hatch.build.targets.wheel]
+packages = ["md2pdf"]
+
+[tool.hatch.build.targets.wheel.force-include]
+"templates" = "templates"
+
+[tool.hatch.build.targets.sdist]
+include = ["md2pdf", "templates", "bin", "md2pdf_run.py"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]

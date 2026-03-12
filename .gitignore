@@ -1,0 +1,43 @@
+# Virtual env & Python
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+*.egg
+dist/
+build/
+eggs/
+*.manifest
+*.spec
+
+# Installer
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Distribution / packaging
+*.pdf
+
+# IDE & OS
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Testing & quality
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# Local config (optional)
+.env
+.env.local

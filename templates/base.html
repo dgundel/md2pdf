@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="{{ lang }}">
+<head>
+<meta charset="UTF-8">
+<style>
+/* ── CSS Variables from Theme ── */
+:root {
+    --color-primary:        {{ theme.colors.primary }};
+    --color-text:           {{ theme.colors.text }};
+    --color-bg:             {{ theme.colors.background }};
+    --color-code-bg:        {{ theme.colors.code_bg }};
+    --color-link:           {{ theme.colors.link }};
+    --color-border:         {{ theme.colors.border }};
+    --color-heading:        {{ theme.colors.heading }};
+    --color-table-hdr-bg:   {{ theme.colors.table_header_bg }};
+
+    --font-body:    {{ theme.fonts.body }};
+    --font-heading: {{ theme.fonts.heading }};
+    --font-mono:    {{ theme.fonts.mono }};
+    --font-emoji:   {{ theme.fonts.emoji_fallback | join(', ') }};
+    --font-size:    {{ theme.fonts.base_size }};
+}
+
+/* ── Page Setup ── */
+@page {
+    size: {{ page_size }};
+    margin: {{ theme.margins.top }}mm {{ theme.margins.right }}mm {{ theme.margins.bottom }}mm {{ theme.margins.left }}mm;
+
+    {% if page_numbers.enabled %}
+    {% if page_numbers.position == "bottom-center" %}
+    @bottom-center {
+        content: "{{ page_number_text | safe }}";
+        font-size: 8.5pt;
+        font-family: var(--font-body);
+        color: var(--color-border);
+    }
+    {% elif page_numbers.position == "bottom-right" %}
+    @bottom-right {
+        content: "{{ page_number_text | safe }}";
+        font-size: 8.5pt;
+        font-family: var(--font-body);
+        color: var(--color-border);
+    }
+    {% elif page_numbers.position == "bottom-left" %}
+    @bottom-left {
+        content: "{{ page_number_text | safe }}";
+        font-size: 8.5pt;
+        font-family: var(--font-body);
+        color: var(--color-border);
+    }
+    {% endif %}
+    {% endif %}
+
+    {% if theme.header.show %}
+    @top-center {
+        content: "{{ theme.header.content }}";
+        font-size: 8pt;
+        font-family: var(--font-body);
+        color: var(--color-border);
+        {% if theme.header.border %}border-bottom: 0.5pt solid var(--color-border);{% endif %}
+    }
+    {% endif %}
+}
+
+/* ── Base Styles ── */
+html, body {
+    font-family: var(--font-body), var(--font-emoji), sans-serif;
+    font-size: var(--font-size);
+    color: var(--color-text);
+    background: var(--color-bg);
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+}
+
+/* ── Headings ── */
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading), var(--font-emoji), sans-serif;
+    color: var(--color-heading);
+    line-height: 1.25;
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+}
+h1 { font-size: calc(var(--font-size) * 2.0); border-bottom: 2pt solid var(--color-primary); padding-bottom: 0.2em; }
+h2 { font-size: calc(var(--font-size) * 1.6); border-bottom: 1pt solid var(--color-border); padding-bottom: 0.15em; }
+h3 { font-size: calc(var(--font-size) * 1.3); }
+h4 { font-size: calc(var(--font-size) * 1.1); }
+h5, h6 { font-size: var(--font-size); }
+
+/* ── Links ── */
+a { color: var(--color-link); text-decoration: none; }
+
+/* ── Paragraphs ── */
+p { margin: 0.6em 0 0.8em 0; }
+
+/* ── Code — ASCII diagrams & inline ── */
+code {
+    font-family: var(--font-mono);
+    font-size: 0.88em;
+    background: var(--color-code-bg);
+    border: 0.5pt solid var(--color-border);
+    border-radius: 3pt;
+    padding: 0.1em 0.35em;
+}
+
+/* Pre blocks: ASCII diagrams — use theme mono font */
+pre {
+    font-family: var(--font-mono);
+    font-size: 0.85em;
+    background: var(--color-code-bg);
+    border: 0.75pt solid var(--color-border);
+    border-left: 3pt solid var(--color-primary);
+    border-radius: 3pt;
+    padding: 1em 1.2em;
+    overflow-x: auto;
+    white-space: pre;           /* never wrap — critical for ASCII art */
+    word-break: normal;
+    word-wrap: normal;
+    line-height: 1.4;
+    page-break-inside: avoid;
+}
+
+pre code {
+    background: none;
+    border: none;
+    padding: 0;
+    font-size: inherit;
+    line-height: inherit;
+}
+
+/* ── Tables ── */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1em 0;
+    font-size: 0.92em;
+    page-break-inside: avoid;
+}
+thead tr {
+    background: var(--color-table-hdr-bg);
+    color: var(--color-heading);
+}
+th {
+    font-family: var(--font-heading);
+    font-weight: bold;
+    text-align: left;
+    padding: 0.5em 0.75em;
+    border: 0.75pt solid var(--color-border);
+}
+td {
+    padding: 0.4em 0.75em;
+    border: 0.75pt solid var(--color-border);
+    vertical-align: top;
+}
+tr:nth-child(even) td { background: color-mix(in srgb, var(--color-code-bg) 40%, white); }
+
+/* ── Blockquotes ── */
+blockquote {
+    border-left: 3pt solid var(--color-primary);
+    margin: 1em 0;
+    padding: 0.5em 1em;
+    color: color-mix(in srgb, var(--color-text) 75%, white);
+    background: var(--color-code-bg);
+}
+blockquote p { margin: 0; }
+
+/* ── Images ── */
+img {
+    max-width: 100%;
+    height: auto;
+}
+.img-missing {
+    display: inline-block;
+    border: 1.5pt dashed var(--color-border);
+    padding: 0.4em 1em;
+    color: var(--color-border);
+    font-style: italic;
+    font-size: 0.85em;
+}
+
+/* ── Task lists ── */
+ul.task-list { list-style: none; padding-left: 1.2em; }
+ul.task-list li input[type="checkbox"] { margin-right: 0.4em; }
+
+/* ── Horizontal rule ── */
+hr {
+    border: none;
+    border-top: 1pt solid var(--color-border);
+    margin: 1.5em 0;
+}
+
+/* ── Page breaks ── */
+.page-break { page-break-after: always; }
+h1 { page-break-before: auto; }
+
+/* ── Watermark ── */
+{% if watermark %}
+@page { background: none; }
+body::before {
+    content: "{{ watermark }}";
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-35deg);
+    font-size: 72pt;
+    font-family: var(--font-heading);
+    color: rgba(180, 180, 180, 0.18);
+    white-space: nowrap;
+    pointer-events: none;
+    z-index: -1;
+}
+{% endif %}
+
+/* ── Title Page ── */
+.title-page {
+    text-align: center;
+    padding-top: 30mm;
+    padding-bottom: 20mm;
+    min-height: 200mm;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+.title-logo { max-width: 60mm; max-height: 40mm; margin-bottom: 15mm; }
+.title-main {
+    font-family: var(--font-heading);
+    font-size: calc(var(--font-size) * 2.8);
+    color: var(--color-primary);
+    border: none;
+    margin: 0 0 0.3em 0;
+    padding: 0;
+    line-height: 1.15;
+}
+.title-subtitle {
+    font-size: calc(var(--font-size) * 1.4);
+    color: var(--color-heading);
+    margin: 0.2em 0 1em 0;
+}
+.title-version {
+    font-size: 0.9em;
+    color: var(--color-border);
+    margin: 0.5em 0;
+}
+.title-meta { margin-top: 20mm; }
+.title-author { font-size: 1.1em; font-weight: bold; margin: 0.3em 0; }
+.title-date { color: var(--color-border); margin: 0.3em 0; font-size: 0.9em; }
+
+/* ── TOC ── */
+.toc {
+    background: var(--color-code-bg);
+    border: 0.75pt solid var(--color-border);
+    border-radius: 4pt;
+    padding: 1.2em 1.5em;
+    margin: 1em 0 2em 0;
+    page-break-after: always;
+}
+.toc-title {
+    font-family: var(--font-heading);
+    font-size: calc(var(--font-size) * 1.3);
+    color: var(--color-heading);
+    border: none;
+    margin: 0 0 0.8em 0;
+    padding: 0;
+}
+.toc ul { list-style: none; padding-left: 1.2em; margin: 0; }
+.toc > ul { padding-left: 0; }
+.toc li { margin: 0.25em 0; }
+.toc a {
+    color: var(--color-text);
+    text-decoration: none;
+    display: flex;
+    justify-content: space-between;
+}
+.toc a:after {
+    content: target-counter(attr(href), page);
+    color: var(--color-border);
+    font-size: 0.85em;
+}
+
+/* Im Dokument vorhandenes TOC (Liste mit #-Links) — gleiche Optik + Seitenzahlen */
+ul.toc-in-document, ol.toc-in-document {
+    list-style: none;
+    padding: 1.2em 1.5em;
+    margin: 1em 0 2em 0;
+    background: var(--color-code-bg);
+    border: 0.75pt solid var(--color-border);
+    border-radius: 4pt;
+    page-break-after: always;
+}
+ul.toc-in-document ul, ul.toc-in-document ol,
+ol.toc-in-document ul, ol.toc-in-document ol {
+    list-style: none;
+    padding-left: 1.2em;
+    margin: 0;
+}
+ul.toc-in-document li, ol.toc-in-document li { margin: 0.25em 0; }
+ul.toc-in-document a, ol.toc-in-document a {
+    color: var(--color-text);
+    text-decoration: none;
+    display: flex;
+    justify-content: space-between;
+}
+ul.toc-in-document a:after, ol.toc-in-document a:after {
+    content: target-counter(attr(href), page);
+    color: var(--color-border);
+    font-size: 0.85em;
+}
+
+/* ── Extra CSS ── */
+{{ extra_css | safe }}
+</style>
+</head>
+<body>
+
+{% if title_page_html %}{{ title_page_html | safe }}{% endif %}
+{% if toc_html %}{{ toc_html | safe }}{% endif %}
+
+<div class="content">
+{{ content_html | safe }}
+</div>
+
+</body>
+</html>

@@ -1,0 +1,38 @@
+name: liberation
+
+colors:
+  primary: "#2563eb"
+  text: "#1a1a1a"
+  background: "#ffffff"
+  code_bg: "#f4f4f5"
+  link: "#2563eb"
+  border: "#d1d5db"
+  heading: "#111111"
+  table_header_bg: "#f3f4f6"
+
+fonts:
+  body: "'Liberation Serif', 'Times New Roman', serif"
+  heading: "'Liberation Sans', Arial, sans-serif"
+  mono: "'Liberation Mono', 'Courier New', monospace"
+  emoji_fallback:
+    - "Noto Color Emoji"
+    - "Apple Color Emoji"
+    - "Segoe UI Emoji"
+  base_size: "11pt"
+  heading_scale: 1.25
+
+margins:
+  top: 25
+  right: 20
+  bottom: 25
+  left: 20
+
+header:
+  show: false
+  content: ""
+  border: true
+
+footer:
+  show: true
+  content: ""
+  border: false

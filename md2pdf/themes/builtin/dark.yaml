@@ -1,0 +1,38 @@
+name: dark
+
+colors:
+  primary: "#60a5fa"
+  text: "#e2e8f0"
+  background: "#0f172a"
+  code_bg: "#1e293b"
+  link: "#93c5fd"
+  border: "#334155"
+  heading: "#f1f5f9"
+  table_header_bg: "#1e293b"
+
+fonts:
+  body: "'Inter', 'Segoe UI', Arial, sans-serif"
+  heading: "'Inter', 'Segoe UI', Arial, sans-serif"
+  mono: "'Cascadia Code', 'JetBrains Mono', 'Fira Code', monospace"
+  emoji_fallback:
+    - "Noto Color Emoji"
+    - "Apple Color Emoji"
+    - "Segoe UI Emoji"
+  base_size: "11pt"
+  heading_scale: 1.25
+
+margins:
+  top: 25
+  right: 20
+  bottom: 25
+  left: 20
+
+header:
+  show: false
+  content: ""
+  border: false
+
+footer:
+  show: true
+  content: ""
+  border: false

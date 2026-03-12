@@ -1,0 +1,6 @@
+#!/bin/sh
+# Systemweiter Aufruf: Symlink nach ~/.local/bin
+#   ln -sf /pfad/zu/md2pdf/bin/md2pdf ~/.local/bin/md2pdf
+SCRIPT="$(readlink -f "$0")"
+PROJECT_ROOT="$(dirname "$(dirname "$SCRIPT")")"
+exec "$PROJECT_ROOT/.venv/bin/python" "$PROJECT_ROOT/md2pdf_run.py" "$@"
